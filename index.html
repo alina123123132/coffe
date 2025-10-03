@@ -65,15 +65,40 @@
         .menu-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid #ddd;
             padding: 8px 0;
             font-size: 18px;
         }
 
-        .order input {
-            width: 50px;
+        .controls button {
+            background-color: #c9ada7;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #a98467;
+        }
+
+        .controls span {
+            min-width: 25px;
             text-align: center;
-            margin-left: 10px;
+            display: inline-block;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
         }
 
         .order-summary {
@@ -90,20 +115,20 @@
             margin-top: 30px;
         }
 
-        .btn-calc {
-            background-color: #c9ada7;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-            transition: 0.3s;
+        .empty {
+            color: #a98467;
+            font-style: italic;
         }
 
-        .btn-calc:hover {
-            background-color: #a98467;
+        @media (max-width: 600px) {
+            nav button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .menu-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -122,37 +147,20 @@
     <!-- 🏠 Головна -->
     <section id="home" class="active">
         <h2>Ласкаво просимо до CoffeeTime!</h2>
-        <p>Ми готуємо найароматнішу каву та найніжніші десерти у місті. Оберіть напій, додайте у замовлення — і насолоджуйтесь смаком щастя!</p>
+        <p>Ми готуємо найароматнішу каву та найніжніші десерти у місті. Оберіть напій у меню — і насолоджуйтесь смаком щастя!</p>
         <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600" alt="coffee" style="max-width:100%;border-radius:20px;margin-top:15px;">
     </section>
 
     <!-- ☕ Меню -->
     <section id="menu">
         <h2>Наше меню</h2>
-        <div class="menu-item"><span>Американо</span><span>60 грн</span></div>
-        <div class="menu-item"><span>Капучино</span><span>75 грн</span></div>
-        <div class="menu-item"><span>Лате</span><span>80 грн</span></div>
-        <div class="menu-item"><span>Чай зелений</span><span>55 грн</span></div>
-        <div class="menu-item"><span>Сирник</span><span>90 грн</span></div>
-        <div class="menu-item"><span>Круасан</span><span>65 грн</span></div>
+        <div id="menu-list"></div>
     </section>
 
-    <!-- 🧮 Замовлення -->
+    <!-- 🧺 Замовлення -->
     <section id="order">
-        <h2>Калькулятор замовлення</h2>
-        <p>Введіть кількість кожної позиції:</p>
-
-        <div class="order">
-            <div class="menu-item">Американо (60 грн) <input type="number" min="0" id="americano" value="0"></div>
-            <div class="menu-item">Капучино (75 грн) <input type="number" min="0" id="cappuccino" value="0"></div>
-            <div class="menu-item">Лате (80 грн) <input type="number" min="0" id="latte" value="0"></div>
-            <div class="menu-item">Чай зелений (55 грн) <input type="number" min="0" id="tea" value="0"></div>
-            <div class="menu-item">Сирник (90 грн) <input type="number" min="0" id="cheesecake" value="0"></div>
-            <div class="menu-item">Круасан (65 грн) <input type="number" min="0" id="croissant" value="0"></div>
-        </div>
-
-        <button class="btn-calc" onclick="calculateTotal()">Підрахувати суму</button>
-
+        <h2>Ваше замовлення</h2>
+        <div id="cart"></div>
         <div class="order-summary" id="summary"></div>
     </section>
 
@@ -170,7 +178,73 @@
 
 <script>
     // ======= Автор: Аліна Рабенко, ФЕМП-5-9 =======
-    // Перемикання вкладок
+
+    // Дані меню
+    const menuItems = [
+        {name: "Американо", price: 60},
+        {name: "Капучино", price: 75},
+        {name: "Лате", price: 80},
+        {name: "Чай зелений", price: 55},
+        {name: "Сирник", price: 90},
+        {name: "Круасан", price: 65}
+    ];
+
+    const cart = {};
+
+    // Відображення меню
+    const menuList = document.getElementById("menu-list");
+    menuItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "menu-item";
+        div.innerHTML = `
+            <span>${item.name} — ${item.price} грн</span>
+            <div class="controls">
+                <button onclick="changeQty('${item.name}', -1)">−</button>
+                <span id="qty-${item.name}">0</span>
+                <button onclick="changeQty('${item.name}', 1)">+</button>
+            </div>
+        `;
+        menuList.appendChild(div);
+    });
+
+    // Зміна кількості товару
+    function changeQty(name, delta) {
+        if (!cart[name]) cart[name] = 0;
+        cart[name] = Math.max(0, cart[name] + delta);
+        document.getElementById(`qty-${name}`).innerText = cart[name];
+        updateCart();
+    }
+
+    // Оновлення кошика
+    function updateCart() {
+        const cartDiv = document.getElementById("cart");
+        const summary = document.getElementById("summary");
+        cartDiv.innerHTML = "";
+        let total = 0;
+
+        const entries = Object.entries(cart).filter(([name, qty]) => qty > 0);
+
+        if (entries.length === 0) {
+            cartDiv.innerHTML = "<p class='empty'>Ваш кошик порожній ☕</p>";
+            summary.innerHTML = "";
+            return;
+        }
+
+        entries.forEach(([name, qty]) => {
+            const item = menuItems.find(i => i.name === name);
+            const itemTotal = item.price * qty;
+            total += itemTotal;
+
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "cart-item";
+            itemDiv.innerHTML = `<span>${name} × ${qty}</span><span>${itemTotal} грн</span>`;
+            cartDiv.appendChild(itemDiv);
+        });
+
+        summary.innerHTML = `<p>Загальна сума до оплати: <b>${total.toFixed(2)} грн</b></p>`;
+    }
+
+    // ======= Перемикання вкладок =======
     const buttons = document.querySelectorAll('.tab-btn');
     const sections = document.querySelectorAll('section');
 
@@ -178,39 +252,10 @@
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
             sections.forEach(s => s.classList.remove('active'));
-
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
         });
     });
-
-    // ======= Калькулятор замовлення =======
-    function calculateTotal() {
-        const prices = {
-            americano: 60,
-            cappuccino: 75,
-            latte: 80,
-            tea: 55,
-            cheesecake: 90,
-            croissant: 65
-        };
-
-        let total = 0;
-
-        for (let item in prices) {
-            const qty = parseInt(document.getElementById(item).value) || 0;
-            total += qty * prices[item];
-        }
-
-        const vat = total * 0.20;
-        const final = total + vat;
-
-        document.getElementById("summary").innerHTML = `
-            <p>Сума без ПДВ: <b>${total.toFixed(2)} грн</b></p>
-            <p>ПДВ (20%): <b>${vat.toFixed(2)} грн</b></p>
-            <p>До оплати: <b>${final.toFixed(2)} грн</b></p>
-        `;
-    }
 </script>
 </body>
 </html>
