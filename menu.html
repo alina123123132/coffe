@@ -1,0 +1,71 @@
+<!-- Сайт розроблено студенткою Аліною Рабенко, група ФЕМП 5-9 -->
+{id: 7, title: "Американо", price: 55},
+{id: 8, title: "Мокко", price: 75}
+];
+
+
+const menuGrid = document.getElementById('menu-grid');
+const totalItemsEl = document.getElementById('total-items');
+const subtotalEl = document.getElementById('subtotal');
+const vatEl = document.getElementById('vat');
+const totalEl = document.getElementById('total');
+const resetBtn = document.getElementById('reset');
+
+
+// Створити картки меню
+function renderMenu(){
+menuGrid.innerHTML = '';
+menuItems.forEach(item =>{
+const card = document.createElement('div');
+card.className = 'menu-card';
+card.innerHTML = `
+<div class=\"menu-info\">\n <h4>${item.title}</h4>\n <div class=\"price\">${item.price} грн</div>\n </div>\n <div class=\"menu-actions\">\n <label>Кількість</label>\n <input type=\"number\" min=\"0\" value=\"0\" data-id=\"${item.id}\" class=\"qty\">\n </div>`;
+menuGrid.appendChild(card);
+});
+
+
+// прив'язати обробники
+document.querySelectorAll('.qty').forEach(inp=>{
+inp.addEventListener('input', onQtyChange);
+});
+}
+
+
+function onQtyChange(){
+// обчислити сумарні величини
+let totalItems = 0;
+let subtotal = 0;
+document.querySelectorAll('.qty').forEach(inp=>{
+const id = Number(inp.dataset.id);
+const qty = Math.max(0, Math.floor(Number(inp.value) || 0));
+const item = menuItems.find(i=>i.id===id);
+totalItems += qty;
+subtotal += qty * item.price;
+// нормалізувати відображення
+inp.value = qty;
+});
+
+
+const vat = Math.round(subtotal * 0.20);
+const total = subtotal + vat;
+
+
+totalItemsEl.textContent = totalItems;
+subtotalEl.textContent = subtotal + ' грн';
+vatEl.textContent = vat + ' грн';
+totalEl.textContent = total + ' грн';
+}
+
+
+resetBtn.addEventListener('click', ()=>{
+document.querySelectorAll('.qty').forEach(inp=> inp.value = 0);
+onQtyChange();
+});
+
+
+// Ініціалізація
+renderMenu();
+onQtyChange();
+</script>
+</body>
+</html>
