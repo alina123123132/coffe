@@ -1,0 +1,36 @@
+/* Загальні стилі — пастельна палітра */
+:root{
+--bg: #fffaf6;
+--card: #fff;
+--muted: #7a6f6f;
+--accent: #f6c6a8; /* теплий персиковий */
+--accent-2: #f7e9e3; /* дуже світлий */
+--text: #2b2b2b;
+--radius: 12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;color:var(--text);background:var(--bg)}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+.site-header{background:var(--card);border-bottom:1px solid #efe6df}
+.header-row{display:flex;align-items:center;gap:12px}
+.brand{margin:0;color:var(--text)}
+.main-nav{margin-left:auto}
+.main-nav .nav-link{margin-left:12px;text-decoration:none;color:var(--text);padding:8px;border-radius:8px}
+.main-nav .nav-link:hover{background:var(--accent-2)}
+.hero{display:flex;flex-direction:column;gap:12px;padding:24px 0}
+.hero-img{width:100%;height:auto;border-radius:12px;object-fit:cover}
+.lead{color:var(--muted)}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.features article{background:var(--card);padding:14px;border-radius:12px;border:1px solid #efe6df}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:18px}
+.menu-card{background:var(--card);border-radius:12px;padding:12px;border:1px solid #efe6df;display:flex;justify-content:space-between;align-items:center}
+.menu-info h4{margin:0}
+.menu-actions{display:flex;flex-direction:column;gap:6px}
+.menu-actions input{width:80px;padding:8px;border-radius:8px;border:1px solid #e8ded6}
+.calculator-card{background:var(--accent-2);padding:14px;border-radius:12px;margin-top:18px;border:1px solid #f0d6c2}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0}
+.summary-row.total{font-weight:700}
+.btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
+.site-footer{background:var(--card);border-top:1px solid #efe6df;margin-top:24px;padding:12px}
+.footer-row{display:flex;justify-content:space-between;align-items:center}
+@media(max-width:800px){.features{grid-template-columns:1fr}.menu-grid{grid-template-columns:1fr}}
